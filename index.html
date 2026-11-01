@@ -1866,7 +1866,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         const worksheet = XLSX.utils.json_to_sheet(exportData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-        XLSX.writeFile(workbook, "마케팅후기_분류완료.xlsx");
+        XLSX.writeFile(workbook, "마케팅후기.xlsx");
     }
 // ★ 여기에 파일 공유 기능을 새롭게 추가합니다 ★
     function shareExcel() {
