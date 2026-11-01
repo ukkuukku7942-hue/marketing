@@ -340,7 +340,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     }
     .tab-btn { padding: 6px 10px; font-size: 13px; white-space: nowrap; }
     
-    /* 2. 상단 버튼 그룹 (불러오기, 공유, 저장) 3개 한 줄 배치 */
+    /* 2. 상단 버튼 그룹 (추가, 저장, 초기화) 3개 한 줄 배치 */
     .btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 100%; }
     .btn-group .top-search-input { grid-column: span 3; width: 100%; box-sizing: border-box; padding: 10px; font-size: 15px; margin-bottom: 2px; }
     .btn-group .btn { width: 100%; padding: 8px 0; font-size: 12px; white-space: nowrap; letter-spacing: -0.5px; }
@@ -398,10 +398,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div class="btn-group">
             <input type="text" id="topOfficeSearch" class="top-search-input" placeholder="🔍 총괄국 검색" oninput="handleTopSearchInput()">
             <input type="file" id="excelInput" accept=".xlsx, .xls" style="display: none;" onchange="importExcel(event)">
-            <button class="btn btn-outline" onclick="document.getElementById('excelInput').click()">📁 불러오기</button>
-            <!-- 공유 버튼 텍스트 변경 -->
-            <button class="btn btn-outline" style="border-color: #3b82f6; color: #3b82f6;" onclick="shareExcel()">📤 파일 공유</button>
+            <!-- 버튼 이름 변경 및 초기화 버튼 추가 -->
+            <button class="btn btn-outline" onclick="document.getElementById('excelInput').click()">📁 추가 불러오기</button>
             <button class="btn" onclick="exportExcel()">💾 백업/저장</button>
+            <button class="btn" style="background-color: #ef4444; color: white;" onclick="clearAllData()">🗑️ 데이터 초기화</button>
         </div>
     </div>
 
@@ -1647,7 +1647,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         const file = event.target.files[0];
         if (!file) return;
 
-        if(!confirm("엑셀 파일을 불러오면 현재 달력의 내용이 엑셀 데이터로 덮어씌워집니다. 진행하시겠습니까?")) {
+        // ★ 안내 문구 변경 (덮어쓰기 -> 추가하기)
+        if(!confirm("엑셀 파일의 데이터를 현재 기록에 추가하여 합치시겠습니까?")) {
             document.getElementById('excelInput').value = ''; return;
         }
 
@@ -1726,7 +1727,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 });
 
                 // 객체를 다시 배열 형태로 변환
-                records = Object.values(tempGroup);
+                const newData = Object.values(tempGroup);
+                
+                // ★ 핵심: 기존 기록(records) 뒤에 새 데이터(newData)를 무조건 이어 붙임! ★
+                records = records.concat(newData);
 
                 saveToLocalStorage(); 
                 updateCompanyDatalist();
@@ -1734,8 +1738,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 if(document.getElementById('dashboardView').style.display === 'block') {
                     initDashYearSelector(); renderDashboard();
                 }
-                alert('엑셀 파일을 성공적으로 불러왔습니다!');
-            } catch (error) { 
+                
+                // (선택) alert 창 대신 이전에 추가하신 예쁜 토스트 알림을 띄우는 것이 좋습니다.
+                showToast('📁 파일의 데이터가 성공적으로 추가되었습니다!');
+            } catch (error) {
                 alert('엑셀 파일을 읽는 중 오류가 발생했습니다.'); 
                 console.error(error); 
             }
@@ -1743,7 +1749,31 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         };
         reader.readAsArrayBuffer(file);
     }
+// ★ 새롭게 추가하는 데이터 초기화 함수 ★
+    function clearAllData() {
+        if (records.length === 0) {
+            alert("이미 데이터가 비어 있습니다.");
+            return;
+        }
 
+        // 사용자의 실수를 막기 위한 이중 확인 장치
+        const isConfirm = confirm("⚠️ 정말 모든 데이터를 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.\n\n(삭제하시기 전에 꼭 [엑셀로 백업/저장]을 먼저 해주세요!)");
+        
+        if (isConfirm) {
+            records = []; // 데이터를 완전히 비웁니다.
+            
+            saveToLocalStorage(); 
+            updateCompanyDatalist();
+            renderCalendar();
+            refreshRecordList();
+            updateTodoBadge();
+            renderTodoList();
+            
+            if(document.getElementById('dashboardView').style.display === 'block') { renderDashboard(); }
+            
+            showToast('🗑️ 모든 데이터가 초기화되었습니다.');
+        }
+    }
     function formatDate(val) {
         if (!val) return "";
         if (val instanceof Date) {
@@ -1863,45 +1893,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         exportData.sort((a, b) => a['일자'].localeCompare(b['일자']));
 
-        // ✅ 여기서부터 새로 붙여넣습니다.
-        try {
-            const worksheet = XLSX.utils.json_to_sheet(exportData);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-            
-            const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-            const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-            const file = new File([blob], "마케팅후기_공유.xlsx", { type: blob.type });
-
-            // 진단 1단계: 브라우저가 공유 기능 자체를 아는지 테스트
-            if (!navigator.share) {
-                alert("진단 1: 이 브라우저는 공유 기능(navigator.share)을 아예 모릅니다. 깃허브(https) 주소가 아니거나, 카카오톡 내부 브라우저일 확률이 높습니다.");
-                XLSX.writeFile(workbook, "마케팅후기_공유.xlsx");
-                return;
-            }
-
-            // 진단 2단계: 글자 말고 '파일' 통째로 공유하는 것을 허락하는지 테스트
-            if (!navigator.canShare || !navigator.canShare({ files: [file] })) {
-                alert("진단 2: 공유 기능은 있지만 '파일'을 넘기는 건 보안상 막혀있습니다. 기기 버전이 낮거나 특정 앱 내부 브라우저입니다.");
-                XLSX.writeFile(workbook, "마케팅후기_공유.xlsx");
-                return;
-            }
-
-            // 진단 3단계: 실제 공유 실행 및 에러 포착
-            navigator.share({
-                files: [file],
-                title: '마케팅 일지 공유',
-                text: '작성하신 마케팅 일지 엑셀 파일입니다.'
-            }).then(() => {
-                // 정상 작동 시 (알림 없이 넘어감)
-            }).catch(error => {
-                // 사용자가 공유 창을 그냥 닫았거나, 시스템 에러가 발생했을 때
-                alert("진단 3 (실행 중 에러): " + error.name + "\n상세: " + error.message);
-            });
-
-        } catch (error) {
-            alert("진단 4 (심각한 에러): 코드 실행 자체가 실패했습니다.\n" + error.message);
-        }
+        
     }
     function renderCalendar() {
         const body = document.getElementById('calendarBody');
