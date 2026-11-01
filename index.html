@@ -319,9 +319,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         overflow-x: auto; /* 화면이 좁으면 좌우로 스와이프(스크롤) 되도록 설정 */
         padding-bottom: 5px;
     }
-    <input type="text" id="topOfficeSearch" class="top-search-input" pl
     /* 깔끔한 디자인을 위해 모바일 가로 스크롤바 숨기기 */
     .title-area::-webkit-scrollbar { display: none; }
+
     .title-area { -ms-overflow-style: none; scrollbar-width: none; }
     
     .title-area h2 { font-size: 16px; white-space: nowrap; margin: 0; }
@@ -1353,7 +1353,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     </div>
                 `;
                 
-                card.onclick = () => { openCompanyHistoryWindow(company); };
+                // ✅ 해결: latest.isInternational 값을 함께 넘겨줍니다!
+                card.onclick = () => { openCompanyHistoryWindow(company, latest.isInternational); };
                 body.appendChild(card);
             });
         }
@@ -1668,13 +1669,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     if (!dateStr) return;
                     
                     const companyName = row['상호명'] || "";
-                    // '일자_상호명'을 고유 키로 사용하여 동일 업체는 하나로 묶음
-                    const key = dateStr + '_' + companyName;
+                    
+                    // ★ 엑셀에 고유 ID가 있으면 그걸 사용하고, (손으로 직접 추가한 줄이라서) 없으면 기존처럼 날짜+상호명을 씁니다.
+                    const importedId = row['관리번호(수정금지)'];
+                    const key = importedId ? importedId : (dateStr + '_' + companyName);
 
                     // 처음 나오는 업체면 기본 틀 생성
                     if (!tempGroup[key]) {
                         let formattedAlarm = "";
-                        let isTriggered = false; 
+                        let isTriggered = false;
                         if (row['알람']) {
                             let alarmDateObj;
                             if (row['알람'] instanceof Date) {
@@ -1688,7 +1691,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         }
 
                         tempGroup[key] = {
-                            id: Date.now() + Math.random(),
+                            id: importedId || (Date.now() + Math.random()), // ★ 불러온 ID가 있으면 그대로 유지
                             date: dateStr,
                             office: row['총괄국'] || "",
                             company: companyName,
@@ -1729,8 +1732,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 // 객체를 다시 배열 형태로 변환
                 const newData = Object.values(tempGroup);
                 
-                // ★ 핵심: 기존 기록(records) 뒤에 새 데이터(newData)를 무조건 이어 붙임! ★
-                records = records.concat(newData);
+                // ★ 스마트 병합: 고유 ID를 비교해서 덮어쓰거나 새로 추가합니다 ★
+                newData.forEach(newItem => {
+                    // ID가 문자열일 수도 있고 숫자일 수도 있으므로 String()으로 감싸서 정확하게 비교합니다.
+                    const existingIndex = records.findIndex(r => String(r.id) === String(newItem.id));
+                    
+                    if (existingIndex > -1) {
+                        // 1. 기존에 있던 데이터면 엑셀의 최신 내용으로 덮어쓰기(업데이트)
+                        records[existingIndex] = newItem;
+                    } else {
+                        // 2. 완전히 새로운 데이터면 맨 뒤에 이어붙이기
+                        records.push(newItem);
+                    }
+                });
 
                 saveToLocalStorage(); 
                 updateCompanyDatalist();
@@ -1816,7 +1830,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 '마케팅 내용': r.marketing,
                 '후기': r.review,
                 '향후 할 일 (To-Do)': todoStrs.join('\n'), // 엑셀 줄바꿈 문자 적용
-                '색상': r.color
+                '색상': r.color,
+                '관리번호(수정금지)': r.id // ★ 시스템 고유 ID를 엑셀에 몰래 포함시킵니다!
             };
 
             // 1. 국내 데이터 처리 (물량을 숫자로 강제 변환)
