@@ -384,7 +384,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <div class="title-area">
             <h2>📈 마케팅 일지 </h2>
             <span class="status-badge">자동 저장 켜짐 🟢</span>
-            
+<!-- ★ 추가: 이름 표시 뱃지 (클릭 시 다시 변경 가능) -->
+            <span id="userNameDisplay" style="margin-left: 10px; font-size: 13px; font-weight: bold; color: #065f46; background: #d1fae5; padding: 4px 10px; border-radius: 6px; border: 1px solid #a7f3d0; cursor: pointer;" onclick="openNameSettingModal()" title="이름을 변경하려면 클릭하세요">👤 담당자: 확인 중...</span>            
+
             <!-- ★ 탭 버튼 추가 ★ -->
             <div class="tabs">
                 <button class="tab-btn" id="tabTodo" onclick="switchTab('todo')">
@@ -396,7 +398,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         </div>
         
         <div class="btn-group">
-            <input type="text" id="topOfficeSearch" class="top-search-input" placeholder="🔍 총괄국 검색" oninput="handleTopSearchInput()">
             <input type="file" id="excelInput" accept=".xlsx, .xls" style="display: none;" onchange="importExcel(event)">
             <!-- 버튼 이름 변경 및 초기화 버튼 추가 -->
             <button class="btn btn-outline" onclick="document.getElementById('excelInput').click()">📁 추가 불러오기</button>
@@ -540,10 +541,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <label>영업 타겟 (단일 선택)</label>
                 <div style="display: flex; flex-direction: row; gap: 20px; align-items: center; background: #f3f4f6; padding: 10px; border-radius: 6px; white-space: nowrap;">
                     <label style="margin:0; font-weight:normal; cursor:pointer; display:flex; align-items:center; gap:5px;">
-                        <input type="radio" name="targetType" id="chkDomestic" checked onchange="toggleTargetFields()"> 국내
+                        <!-- ★ 추가: toggleTargetFields() 뒤에 autoFillCompanyInfo() 추가 -->
+                        <input type="radio" name="targetType" id="chkDomestic" checked onchange="toggleTargetFields(); autoFillCompanyInfo();"> 국내
                     </label>
                     <label style="margin:0; font-weight:normal; cursor:pointer; display:flex; align-items:center; gap:5px;">
-                        <input type="radio" name="targetType" id="chkInternational" onchange="toggleTargetFields()"> 국제
+                        <!-- ★ 추가: toggleTargetFields() 뒤에 autoFillCompanyInfo() 추가 -->
+                        <input type="radio" name="targetType" id="chkInternational" onchange="toggleTargetFields(); autoFillCompanyInfo();"> 국제
                     </label>
                 </div>
             </div>
@@ -552,19 +555,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <select id="statusInput">
                                 <option value="진행 전">⚪ 진행 전</option>
                                 <option value="진행 중" selected>🔵 진행 중</option>
-                                <option value="계약 완료">🟢 계약 완료</option>
+                                <option value="계약 완료">✅ 계약 완료</option>
                                 <option value="계약 실패">🔴 계약 실패</option>
-                                <option value="보류">🟡 보류</option>
+                                <option value="보류">⏳ 보류</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <!-- ★ id="officeInputContainer" 를 추가했습니다 -->
-                        <div class="form-group" style="flex: 1.5;" id="officeInputContainer">
-                            <label>총괄국</label>
-                            <input type="text" id="officeInput" placeholder="예: 부산우체국">
-                        </div>
+                        <div class="form-group" style="display: none;" id="officeInputContainer">
+    <label>총괄국</label>
+    <input type="text" id="officeInput" placeholder="예: 부산우체국">
+</div>
                         <div class="form-group" style="flex: 2.5;">
                             <label>상호명</label>
                             <input type="text" id="companyInput" list="companyList" placeholder="상호명 입력 시 자동완성" onchange="autoFillCompanyInfo()">
@@ -579,7 +582,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <div class="form-row">
                         <div class="form-group" style="flex: 2;">
                             <label>주소</label>
-                            <input type="text" id="addressInput" placeholder="예: 부산광역시 연제구...">
+                            <input type="text" id="addressInput" placeholder="예: 부산광역시 연제구..." onchange="autoFillCompanyInfo()">
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label>온라인몰</label>
@@ -595,6 +598,18 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         <div class="form-group">
                             <label>연락처</label>
                             <input type="text" id="contactInput" placeholder="예: 010-1234-5678">
+                        </div>
+                    </div>
+
+                    <!-- ★ 추가: 동행자 및 정보제공자 입력 폼 -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>동행자 (선택)</label>
+                            <input type="text" id="companionInput" placeholder="예: 홍길동 주무관 (매번 직접 입력)">
+                        </div>
+                        <div class="form-group">
+                            <label>정보제공자 (선택)</label>
+                            <input type="text" id="sourceInput" placeholder="예: 온정이 팀장 (자동완성 됨)">
                         </div>
                     </div>
 
@@ -688,7 +703,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <!-- 상단: 연간 실적 그래프 및 표 (id 추가 및 영역 분리) -->
         <div class="dashboard-panel" id="annualPerformancePanel">
             <div class="dash-header">
-                <h3>📊 연간 월별/총괄국별 마케팅 실적 현황</h3>
+                <h3>📊 연간 월별 마케팅 활동 현황</h3>
                 <div>
                     <label style="font-size:14px; font-weight:bold; margin-right:8px;">조회 연도:</label>
                     <select id="dashYearSelect" onchange="renderDashboard()" style="padding:6px; font-size:15px; border-radius:6px; border:1px solid #d1d5db;"></select>
@@ -705,7 +720,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <table class="pivot-table" id="pivotTable">
                     <thead>
                         <tr>
-                            <th style="background:#e5e7eb;">총괄국 월별</th>
+                            <!-- ★ '총괄국 월별'을 '구분'으로 변경 -->
+                            <th style="background:#e5e7eb;">구분</th>
                             <th>1월</th><th>2월</th><th>3월</th><th>4월</th><th>5월</th><th>6월</th>
                             <th>7월</th><th>8월</th><th>9월</th><th>10월</th><th>11월</th><th>12월</th>
                             <th class="col-total" style="background:#dbeafe;">합계</th>
@@ -775,6 +791,49 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
 </div>
             </div>
+
+            <!-- ★ 신규 추가: 우수 정보제공자 분석 패널 ★ -->
+            <div class="dashboard-panel" id="sourceAnalysisPanel" style="border-top: 3px solid #8b5cf6;">
+                <div class="dash-header">
+                    <h3 style="font-size: 15px; font-weight: bold; color: #374151;">🏆 우수 정보제공자 기여도 분석</h3>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <label style="font-size:12px; font-weight:bold; color:#4b5563;">조회 기간:</label>
+                        <select id="dashSourceYearSelect" onchange="renderSourceAnalysis()" style="padding:4px 8px; font-size:13px; border-radius:4px; border:1px solid #d1d5db;"></select>
+                        <select id="dashSourceMonthSelect" onchange="renderSourceAnalysis()" style="padding:4px 8px; font-size:13px; border-radius:4px; border:1px solid #d1d5db;">
+                            <option value="ALL">전체 월</option>
+                            <!-- 1~12월 JS로 생성 -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
+                    <!-- 1. 누적 막대 그래프 -->
+                    <div style="flex: 1.5; min-width: 350px; height: 250px; position: relative;">
+                        <canvas id="sourceChart"></canvas>
+                    </div>
+                    
+                    <!-- 2. 우수 랭킹 표 -->
+                    <div style="flex: 1; min-width: 300px; overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 8px;">
+                        <table class="pivot-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th style="background:#f9fafb; width: 40px;">순위</th>
+                                    <th style="background:#f9fafb;">정보제공자</th>
+                                    <th>총 제공</th>
+                                    <th style="color:#10b981;">완료</th>
+                                    <th style="color:#3b82f6;">진행</th>
+                                    <th style="background:#ecfdf5; color:#065f46;">성공률</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sourceTableBody">
+                                <!-- JS에서 동적 생성 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
     </div>
 
@@ -814,15 +873,27 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
 </div>
 
+<!-- ★ 추가: 담당자 이름 설정 모달 (최초 1회 팝업) ★ -->
+<div class="modal-overlay" id="nameSettingModal" style="z-index: 3000;">
+    <div class="modal notice-modal" style="width: 350px; border-color: #10b981;">
+        <h2 style="color: #10b981;">👤 담당자 설정</h2>
+        <div class="notice-desc" style="background: #f0fdf4;">
+            이 기기에서 사용할 <b>담당자(작성자) 이름</b>을 입력해주세요.<br>
+            <span style="font-size: 12px; color: #6b7280;">(입력된 이름은 엑셀 파일명에 사용되며 한 번만 입력하면 됩니다)</span>
+        </div>
+        <input type="text" id="userNameInput" placeholder="예: 우정이" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px; margin-bottom: 15px; text-align: center; box-sizing: border-box;">
+        <button class="btn" style="width: 100%; padding: 12px; font-size: 15px; background: #10b981;" onclick="saveUserName()">저장하고 시작하기</button>
+    </div>
+</div>
+
 <!-- ★ 새롭게 추가된 토스트 알림 상자 ★ -->
 <div id="toastMessage" class="toast-message">💾 저장되었습니다!</div>
 
 <script>
-    // ★ true로 바꾸면 부산청 지방청용 (총괄국 검색 + 연간 그래프/표 활성화)
-    // ★ false로 바꾸면 개별국용 (총괄국 검색 숨김 + 연간 그래프/표 숨김)
-    const IS_HQ_VERSION = false; 
-
     let records = JSON.parse(localStorage.getItem('marketingRecords')) || []; 
+    // ★ 추가: 로컬 스토리지에서 담당자 이름 불러오기
+    let currentUserName = localStorage.getItem('marketingUserName') || ""; 
+
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
     let activeDate = "";
@@ -830,13 +901,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     let mainDashChart = null; // 대시보드 차트 객체 저장용
     let domCompChart = null;  // 국내 경쟁사 차트 객체
     let intCompChart = null;  // 국제 경쟁사 차트 객체
+    let sourceChartObj = null; // ★ 추가: 정보제공자 차트 객체
     
+    // ★ 초록/노란 동그라미 대신 호환성이 높은 체크, 모래시계 등으로 교체
     const statusIcons = {
         "진행 전": "⚪",
         "진행 중": "🔵",
-        "계약 완료": "🟢",
+        "계약 완료": "✅",
         "계약 실패": "🔴",
-        "보류": "🟡"
+        "보류": "⏳"
     };
     
     // 차트용 색상 팔레트
@@ -868,6 +941,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         } else if(tabId === 'dashboard') {
             initDashYearSelector();
             renderDashboard();
+            renderSourceAnalysis(); // ★ 추가: 정보제공자 분석 차트 렌더링 호출
         } else if(tabId === 'todo') {
             renderTodoList();
         }
@@ -889,6 +963,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             sel.appendChild(opt);
         });
         sel.value = years.includes(currentSelected) ? currentSelected : years[0];
+        
+        // ★ 추가: 정보제공자 패널의 연도/월 필터 동기화
+        const srcYearSel = document.getElementById('dashSourceYearSelect');
+        if (srcYearSel) {
+            srcYearSel.innerHTML = sel.innerHTML; 
+            srcYearSel.value = sel.value;
+        }
+        const srcMonthSel = document.getElementById('dashSourceMonthSelect');
+        if (srcMonthSel && srcMonthSel.options.length <= 1) { 
+            for(let m=1; m<=12; m++) {
+                srcMonthSel.appendChild(new Option(m + '월', String(m).padStart(2, '0')));
+            }
+        }
     }
 
     // ★ 공통: 파이 차트 그리기 함수 (전역으로 분리) ★
@@ -925,9 +1012,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         const year = document.getElementById('dashYearSelect').value;
         const yearRecords = records.filter(r => r.date.startsWith(year));
         
-        const uniqueComps = [...new Set(yearRecords.map(r => r.company).filter(c => c))];
-        const latestYearRecords = uniqueComps.map(comp => {
-            const compRecs = yearRecords.filter(r => r.company === comp).sort((a,b) => a.date.localeCompare(b.date));
+        // ★ 수정: 상호명과 주소를 조합하여 고유 업체 식별
+        const uniqueKeys = [...new Set(yearRecords.map(r => r.company + '|@|' + (r.address || '')).filter(k => !k.startsWith('|@|')))];
+        const latestYearRecords = uniqueKeys.map(key => {
+            const [comp, addr] = key.split('|@|');
+            const compRecs = yearRecords.filter(r => r.company === comp && (r.address || '') === addr).sort((a,b) => a.date.localeCompare(b.date));
             return compRecs[compRecs.length - 1]; 
         });
 
@@ -965,13 +1054,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         const year = document.getElementById('dashYearSelect').value;
         const yearRecords = records.filter(r => r.date.startsWith(year));
         
-        const offices = [...new Set(yearRecords.map(r => r.office || '미지정 국'))].sort();
+        // ★ 수정: '미지정 국' 대신 '전체 실적'으로 텍스트 변경
+        const offices = [...new Set(yearRecords.map(r => r.office || '전체 활동'))].sort();
         const monthlyData = {};
         offices.forEach(off => { monthlyData[off] = new Array(12).fill(0); });
         
         yearRecords.forEach(r => {
             const monthIdx = parseInt(r.date.split('-')[1], 10) - 1;
-            const off = r.office || '미지정 국';
+            // ★ 수정: '미지정 국' 대신 '전체 실적'으로 텍스트 변경
+            const off = r.office || '전체 활동';
             if(monthlyData[off]) monthlyData[off][monthIdx]++;
         });
 
@@ -989,7 +1080,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             data: { labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'], datasets: datasets },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { position: 'top' }, tooltip: { mode: 'index', intersect: false } },
+                // ★ 수정: 항목이 1개(전체 실적)뿐이면 범례(legend)를 아예 숨기도록 설정
+                plugins: { legend: { display: offices.length > 1, position: 'top' }, tooltip: { mode: 'index', intersect: false } },
                 scales: {
                     x: { stacked: true, title: {display:true, text:'월'} },
                     y: { stacked: true, beginAtZero: true, ticks: {stepSize: 1}, title: {display:true, text:'마케팅 진행 건수'} }
@@ -1036,9 +1128,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // ====================================================================
         // 타겟 시장 경쟁사 점유율 & 핵심 공략 타겟 Top 5
         // ====================================================================
-        const uniqueComps = [...new Set(yearRecords.map(r => r.company).filter(c => c))];
-        const latestYearRecords = uniqueComps.map(comp => {
-            const compRecs = yearRecords.filter(r => r.company === comp).sort((a,b) => a.date.localeCompare(b.date));
+        // ★ 수정: 상호명과 주소를 조합하여 고유 업체 식별
+        const uniqueKeys = [...new Set(yearRecords.map(r => r.company + '|@|' + (r.address || '')).filter(k => !k.startsWith('|@|')))];
+        const latestYearRecords = uniqueKeys.map(key => {
+            const [comp, addr] = key.split('|@|');
+            const compRecs = yearRecords.filter(r => r.company === comp && (r.address || '') === addr).sort((a,b) => a.date.localeCompare(b.date));
             return compRecs[compRecs.length - 1]; 
         });
 
@@ -1072,9 +1166,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // 최신 데이터 가져오기 (대시보드 메인 로직과 동일)
         const year = document.getElementById('dashYearSelect').value;
         const yearRecords = records.filter(r => r.date.startsWith(year));
-        const uniqueComps = [...new Set(yearRecords.map(r => r.company).filter(c => c))];
-        const latestYearRecords = uniqueComps.map(comp => {
-            const compRecs = yearRecords.filter(r => r.company === comp).sort((a,b) => a.date.localeCompare(b.date));
+        
+        // ★ 수정: 상호명과 주소 조합 로직 적용
+        const uniqueKeys = [...new Set(yearRecords.map(r => r.company + '|@|' + (r.address || '')).filter(k => !k.startsWith('|@|')))];
+        const latestYearRecords = uniqueKeys.map(key => {
+            const [comp, addr] = key.split('|@|');
+            const compRecs = yearRecords.filter(r => r.company === comp && (r.address || '') === addr).sort((a,b) => a.date.localeCompare(b.date));
             return compRecs[compRecs.length - 1]; 
         });
 
@@ -1107,18 +1204,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             top5.forEach((r, idx) => {
                 let rankColor = idx < 3 ? '#ef4444' : '#9ca3af';
                 
-                // ★ 지방청 버전(IS_HQ_VERSION = true)일 때만 총괄국 이름 표시
-                let officeHtml = '';
-                if (IS_HQ_VERSION) {
-                    officeHtml = `<div style="font-size: 11px; color: #6b7280; margin-top: 3px; font-weight: normal;">🏢 ${r.office || '총괄국 미상'}</div>`;
-                }
+                // ★ 총괄국 이름 항상 표시
+                let officeHtml = `<div style="font-size: 11px; color: #6b7280; margin-top: 3px; font-weight: normal;">🏢 ${r.office || '총괄국 미상'}</div>`;
 
                 top5Body.innerHTML += `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; border-bottom: 1px solid #f3f4f6;">
                         <div style="display: flex; align-items: center; gap: 15px;">
                             <div style="font-size: 16px; font-weight: 900; color: ${rankColor}; width: 16px; text-align: center; font-style: italic;">${idx + 1}</div>
                             <div style="display: flex; flex-direction: column;">
-                                <div onclick="openCompanyHistoryWindow('${r.company}', ${r.isInternational})" style="font-weight: bold; color: #374151; font-size: 14px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: transparent; transition: 0.2s;" onmouseover="this.style.textDecorationColor='#d1d5db'" onmouseout="this.style.textDecorationColor='transparent'">
+                                <!-- ★ 수정: openCompanyHistoryWindow 함수에 2번째 파라미터로 '${r.address || ''}' 를 추가했습니다! -->
+                                <div onclick="openCompanyHistoryWindow('${r.company}', '${r.address || ''}', ${r.isInternational})" style="font-weight: bold; color: #374151; font-size: 14px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: transparent; transition: 0.2s;" onmouseover="this.style.textDecorationColor='#d1d5db'" onmouseout="this.style.textDecorationColor='transparent'">
                                     ${r.company}
                                 </div>
                                 ${officeHtml}
@@ -1128,6 +1223,98 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             ${r.sortVol.toLocaleString()}건
                         </div>
                     </div>
+                `;
+            });
+        }
+    }
+
+// ★ 우수 정보제공자 분석 렌더링 함수
+    function renderSourceAnalysis() {
+        const year = document.getElementById('dashSourceYearSelect').value;
+        const month = document.getElementById('dashSourceMonthSelect').value;
+        
+        let filteredRecords = records.filter(r => r.date.startsWith(year));
+        if (month !== 'ALL') {
+            // 선택한 월과 일치하는 데이터만 필터링 (예: '2026-11'에서 '11' 추출)
+            filteredRecords = filteredRecords.filter(r => r.date.substring(5, 7) === month);
+        }
+
+        // 1. 상호명+주소 기준으로 유일한 업체 필터링 (최신 상태 기준)
+        const uniqueKeys = [...new Set(filteredRecords.map(r => r.company + '|@|' + (r.address || '')).filter(k => !k.startsWith('|@|')))];
+        const latestRecords = uniqueKeys.map(key => {
+            const [comp, addr] = key.split('|@|');
+            const compRecs = filteredRecords.filter(r => r.company === comp && (r.address || '') === addr).sort((a,b) => a.date.localeCompare(b.date));
+            return compRecs[compRecs.length - 1]; 
+        });
+
+        // 2. 정보제공자별로 실적 집계
+        const sourceData = {};
+        latestRecords.forEach(r => {
+            if (!r.source) return; // 정보제공자가 없는 건 제외
+            const src = r.source.trim();
+            if (!sourceData[src]) {
+                sourceData[src] = { total: 0, completed: 0, inProgress: 0, others: 0 };
+            }
+            sourceData[src].total++;
+            
+            if (r.status === '계약 완료') sourceData[src].completed++;
+            else if (r.status === '진행 중') sourceData[src].inProgress++;
+            else sourceData[src].others++; // 진행 전, 실패, 보류 등
+        });
+
+        // 3. 배열로 변환 및 랭킹 정렬 (1순위: 총 건수, 2순위: 계약 완료 수)
+        const sourceArr = Object.keys(sourceData).map(src => ({
+            name: src,
+            ...sourceData[src],
+            rate: sourceData[src].total > 0 ? Math.round((sourceData[src].completed / sourceData[src].total) * 100) : 0
+        })).sort((a, b) => b.total - a.total || b.completed - a.completed);
+
+        // 4. 누적 막대 그래프 그리기 (Stacked Bar Chart)
+        const ctx = document.getElementById('sourceChart').getContext('2d');
+        if (sourceChartObj) sourceChartObj.destroy();
+
+        sourceChartObj = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sourceArr.map(s => s.name),
+                datasets: [
+                    { label: '계약 완료', data: sourceArr.map(s => s.completed), backgroundColor: '#10b981' }, // 초록
+                    { label: '진행 중', data: sourceArr.map(s => s.inProgress), backgroundColor: '#3b82f6' }, // 파랑
+                    { label: '기타(보류/실패)', data: sourceArr.map(s => s.others), backgroundColor: '#d1d5db' } // 회색
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: {size: 11} } } },
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+
+        // 5. 우수 랭킹 표 그리기
+        const tbody = document.getElementById('sourceTableBody');
+        tbody.innerHTML = '';
+        if (sourceArr.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="padding:30px 10px; color:#6b7280;">해당 기간에 등록된 정보제공자 내역이 없습니다.</td></tr>';
+        } else {
+            sourceArr.forEach((s, idx) => {
+                // 1~3등은 메달 표시
+                let rankTds = `<td>${idx + 1}</td>`;
+                if(idx === 0) rankTds = `<td style="font-weight:900; color:#f59e0b; font-size:14px;">🥇 1</td>`;
+                else if(idx === 1) rankTds = `<td style="font-weight:bold; color:#9ca3af;">🥈 2</td>`;
+                else if(idx === 2) rankTds = `<td style="font-weight:bold; color:#b45309;">🥉 3</td>`;
+
+                tbody.innerHTML += `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        ${rankTds}
+                        <td style="font-weight:bold; color:#374151;">${s.name}</td>
+                        <td style="font-weight:bold;">${s.total}</td>
+                        <td style="color:#10b981; font-weight:bold;">${s.completed}</td>
+                        <td style="color:#3b82f6;">${s.inProgress}</td>
+                        <td style="font-weight:bold; color:#059669; background:#ecfdf5;">${s.rate}%</td>
+                    </tr>
                 `;
             });
         }
@@ -1172,7 +1359,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 // 수정 포인트: 시간이나 내용 둘 중 하나라도 있고 완료 안 된 항목 수집
                 if ((t.time || t.content) && !t.triggered) {
                     // ★ isInternational: r.isInternational 추가
-                    allPendingTodos.push({ recordId: r.id, todoIndex: idx, company: r.company, time: t.time, content: t.content, isInternational: r.isInternational });
+                    allPendingTodos.push({ recordId: r.id, todoIndex: idx, company: r.company, address: r.address || '', time: t.time, content: t.content, isInternational: r.isInternational });
                 }
             });
         });
@@ -1211,7 +1398,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <div class="todo-info">
                     <span class="todo-date" style="${dateStyle}">⏰ ${dateStr}</span>
                     <!-- ★ onclick 파라미터에 ${t.isInternational} 추가 -->
-                    <span class="todo-company" title="클릭하면 상세 이력이 열립니다" onclick="openCompanyHistoryWindow('${t.company}', ${t.isInternational})">${t.company || '상호명 없음'}</span>
+                    <span class="todo-company" title="클릭하면 상세 이력이 열립니다" onclick="openCompanyHistoryWindow('${t.company}', '${t.address}', ${t.isInternational})">
+                        ${t.company || '상호명 없음'} <span style="font-size:11px; font-weight:normal; color:#6b7280;">(${t.address || '주소 없음'})</span>
+                    </span>
                     <span class="todo-content">${t.content || '내용 없음'}</span>
                 </div>
                 <button class="todo-done-btn" onclick="markTodoDone('${t.recordId}', ${t.todoIndex})">✔ 완료</button>
@@ -1362,9 +1551,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     }
 
     // ★ 매개변수에 isInternational(국제 여부) 추가
-    function openCompanyHistoryWindow(companyName, isInternational) {
-        // ★ 상호명뿐만 아니라 국내/국제 여부도 일치하는 기록만 필터링
-        const companyRecords = records.filter(r => r.company === companyName && !!r.isInternational === !!isInternational).sort((a, b) => a.date.localeCompare(b.date));
+    function openCompanyHistoryWindow(companyName, address, isInternational) {
+        // ★ 상호명 + 주소 + 국내/국제 여부가 모두 일치하는 기록만 필터링
+        const companyRecords = records.filter(r => r.company === companyName && (r.address || '') === address && !!r.isInternational === !!isInternational).sort((a, b) => a.date.localeCompare(b.date));
         
         if (companyRecords.length === 0) {
             alert('해당 조건의 마케팅 내역이 없습니다.');
@@ -1377,13 +1566,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         // ★ 추가: 팝업창 제목에 들어갈 국내/국제 라벨 생성 (최신 기록 기준)
         const targetTitleLabel = latest.isInternational ? "[국제]" : "[국내]";
 
-        let chartLabels = [];
+       let chartLabels = [];
         let chartData = [];
         companyRecords.forEach(r => {
             chartLabels.push(r.date);
-            let vol = parseInt(String(r.volume).replace(/[^0-9]/g, '')) || 0;
+            // ★ 수정: 국내/국제 여부에 따라 올바른 물량 데이터 가져오기
+            let rVol = r.isInternational ? (r.internationalVolume || r.volume) : (r.domesticVolume || r.volume);
+            let vol = parseInt(String(rVol).replace(/[^0-9]/g, '')) || 0;
             chartData.push(vol);
         });
+
+// 👇👇👇 여기에 새로운 변수 3줄을 추가해 주세요! 👇👇👇
+        const latestProd = latest.isInternational ? (latest.internationalProduct || latest.product) : (latest.domesticProduct || latest.product);
+        const latestVol = latest.isInternational ? (latest.internationalVolume || latest.volume) : (latest.domesticVolume || latest.volume);
+        const latestDel = latest.isInternational ? (latest.internationalDelivery || latest.delivery) : (latest.domesticDelivery || latest.delivery);
+        // 👆👆👆 여기까지 추가 👆👆👆
 
         let html = `
         <!DOCTYPE html>
@@ -1469,22 +1666,28 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <div class="header-actions">
                     <h1>
                         <!-- ★ 제목에 targetTitleLabel 변수를 추가했습니다 -->
-                        <div class="title-left"><span class="color-badge"></span> ${targetTitleLabel} ${companyName} 마케팅 내역</div>
+                        <!-- ★ 제목에 주소까지 함께 표시되도록 수정 -->
+                        <div class="title-left">
+                            <span class="color-badge"></span> ${targetTitleLabel} ${companyName} 
+                            <span style="font-size: 14px; color: #6b7280; font-weight: normal;">(${address || '주소 미상'})</span> 마케팅 내역
+                        </div>
                         <div class="final-status">${statusIcon} ${latest.status || '상태 없음'}</div>
                     </h1>
                     <button class="print-btn" onclick="window.print()">🖨️ 인쇄하기</button>
                 </div>
                 
                 <div class="info-panel">
-                    <div class="info-item"><span class="info-label">총괄국</span><span class="info-value">${latest.office || '-'}</span></div>
-                    <div class="info-item"><span class="info-label">온라인몰</span><span class="info-value">${latest.mall || '-'}</span></div>
-                    <div class="info-item" style="grid-column: span 2;"><span class="info-label">주소</span><span class="info-value">${latest.address || '-'}</span></div>
-                    <div class="info-item"><span class="info-label">담당자</span><span class="info-value">${latest.manager || '-'}</span></div>
-                    <div class="info-item"><span class="info-label">연락처</span><span class="info-value">${latest.contact || '-'}</span></div>
-                    <div class="info-item"><span class="info-label">주요상품</span><span class="info-value">${latest.product || '-'}</span></div>
-                    <div class="info-item"><span class="info-label">월 물량</span><span class="info-value">${latest.volume ? latest.volume+'건' : '-'}</span></div>
-                    <div class="info-item" style="grid-column: span 2;"><span class="info-label">현재 이용택배사</span><span class="info-value">${latest.delivery || '-'}</span></div>
-                </div>
+<div class="info-item" style="display: none;"><span class="info-label">총괄국</span><span class="info-value">${latest.office || '-'}</span></div>
+                        <div class="info-item"><span class="info-label">온라인몰</span><span class="info-value">${latest.mall || '-'}</span></div>
+                        <div class="info-item" style="grid-column: span 2;"><span class="info-label">주소</span><span class="info-value">${latest.address || '-'}</span></div>
+                        <div class="info-item"><span class="info-label">담당자</span><span class="info-value">${latest.manager || '-'}</span></div>
+                        <div class="info-item"><span class="info-label">연락처</span><span class="info-value">${latest.contact || '-'}</span></div>
+                        
+                        <!-- ★ 방금 만든 latestProd, latestVol, latestDel 변수로 교체 -->
+                        <div class="info-item"><span class="info-label">주요상품</span><span class="info-value">${latestProd || '-'}</span></div>
+                        <div class="info-item"><span class="info-label">월 물량</span><span class="info-value">${latestVol ? latestVol+'건' : '-'}</span></div>
+                        <div class="info-item" style="grid-column: span 2;"><span class="info-label">현재 이용택배사</span><span class="info-value">${latestDel || '-'}</span></div>
+                    </div>
 
                 <div class="chart-container">
                     <canvas id="volumeChart"></canvas>
@@ -1513,6 +1716,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
             
             const rIcon = statusIcons[r.status] || "⚪";
+            
+            // ★ 추가: 각 타임라인 기록의 국내/국제 여부에 따라 데이터 가져오기
+            const rVol = r.isInternational ? (r.internationalVolume || r.volume) : (r.domesticVolume || r.volume);
+            const rDel = r.isInternational ? (r.internationalDelivery || r.delivery) : (r.domesticDelivery || r.delivery);
 
             html += `
                     <div class="record-card">
@@ -1521,7 +1728,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             <span class="r-status-badge">${rIcon} ${r.status || '상태 없음'}</span>
                         </div>
                         <div class="r-sub-info">
-                            <strong>📦 월 물량:</strong> ${r.volume ? r.volume + '건' : '-'} <span>|</span> <strong>🚚 이용택배사:</strong> ${r.delivery || '-'} <span>|</span> <strong>🛒 온라인몰:</strong> ${r.mall || '-'}
+                            <!-- ★ 수정: r.volume 대신 rVol, r.delivery 대신 rDel 사용 -->
+                            <strong>📦 월 물량:</strong> ${rVol ? rVol + '건' : '-'} <span>|</span> <strong>🚚 이용택배사:</strong> ${rDel || '-'} <span>|</span> <strong>🛒 온라인몰:</strong> ${r.mall || '-'} <span>|</span> <strong>👥 동행자:</strong> ${r.companion || '-'} <span>|</span> <strong>💡 정보제공자:</strong> ${r.source || '-'}
                         </div>
                         <div class="r-grid">
                             <div class="r-label">마케팅 내용</div>
@@ -1603,11 +1811,20 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
     function autoFillCompanyInfo() {
         const companyName = document.getElementById('companyInput').value.trim();
+        const addressName = document.getElementById('addressInput').value.trim(); // ★ 추가: 입력된 주소 가져오기
         const currentId = document.getElementById('recordId').value;
+        const isDomChecked = document.getElementById('chkDomestic').checked;
         
         if (companyName && !currentId) {
             const sortedRecords = [...records].sort((a, b) => b.date.localeCompare(a.date));
-            const pastRecord = sortedRecords.find(r => r.company === companyName);
+            
+            const pastRecord = sortedRecords.find(r => {
+                const matchCompany = (r.company === companyName);
+                const matchTarget = isDomChecked ? (r.isDomestic !== false) : (r.isInternational === true);
+                // ★ 추가: 주소가 입력되어 있다면 상호명+주소가 모두 일치하는 것만 찾기
+                const matchAddress = addressName ? ((r.address || '') === addressName) : true; 
+                return matchCompany && matchTarget && matchAddress;
+            });
 
             if (pastRecord) {
                 document.getElementById('officeInput').value = pastRecord.office || '';
@@ -1615,11 +1832,47 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 document.getElementById('mallInput').value = pastRecord.mall || '';
                 document.getElementById('managerInput').value = pastRecord.manager || ''; 
                 document.getElementById('contactInput').value = pastRecord.contact || '';
-                document.getElementById('productInput').value = pastRecord.product || '';
-                document.getElementById('volumeInput').value = pastRecord.volume || '';
-                document.getElementById('deliveryInput').value = pastRecord.delivery || '';
+                document.getElementById('sourceInput').value = pastRecord.source || '';
+                
+                // (주의: 여기서 타겟 라디오 버튼을 강제로 바꾸던 코드는 삭제했습니다. 이미 체크된 타겟을 기준으로 불러왔기 때문입니다.)
+
+                // 국내 상품군, 물량, 택배사 자동완성
+                const dpVal = pastRecord.domesticProduct || pastRecord.product || '';
+                const dpSelect = document.getElementById('domesticProductSelect');
+                const dpInput = document.getElementById('domesticProduct');
+                
+                const isExist = Array.from(dpSelect.options).some(opt => opt.value === dpVal && dpVal !== '');
+                if (dpVal === '') {
+                    dpSelect.value = ''; dpInput.style.display = 'none';
+                } else if (isExist) {
+                    dpSelect.value = dpVal; dpInput.style.display = 'none';
+                } else {
+                    dpSelect.value = '직접입력'; dpInput.style.display = 'block';
+                }
+                dpInput.value = dpVal;
+                
+                document.getElementById('domesticVolume').value = pastRecord.domesticVolume || pastRecord.volume || '';
+                document.getElementById('domesticDelivery').value = pastRecord.domesticDelivery || pastRecord.delivery || '';
+                
+                // 국제 상품, 물량, 택배사 자동완성
+                document.getElementById('internationalProduct').value = pastRecord.internationalProduct || '';
+                document.getElementById('internationalVolume').value = pastRecord.internationalVolume || '';
+                document.getElementById('internationalDelivery').value = pastRecord.internationalDelivery || '';
+                
                 document.getElementById('colorInput').value = pastRecord.color || '#10b981';
                 document.getElementById('statusInput').value = pastRecord.status || '진행 중';
+                
+                toggleTargetFields();
+            } else {
+                // ★ 추가: 체크된 타겟에 해당하는 과거 기록이 없다면 아래 필드들을 초기화하여 혼선 방지
+                document.getElementById('domesticProductSelect').value = '';
+                document.getElementById('domesticProduct').style.display = 'none';
+                document.getElementById('domesticProduct').value = '';
+                document.getElementById('domesticVolume').value = '';
+                document.getElementById('domesticDelivery').value = '';
+                document.getElementById('internationalProduct').value = '';
+                document.getElementById('internationalVolume').value = '';
+                document.getElementById('internationalDelivery').value = '';
             }
         }
     }
@@ -1664,15 +1917,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const now = new Date();
                 const tempGroup = {}; // 날짜+상호명이 같으면 합치기 위한 임시 보관소
 
-                jsonData.forEach(row => {
+               jsonData.forEach(row => {
                     const dateStr = formatDate(row['일자']);
                     if (!dateStr) return;
                     
                     const companyName = row['상호명'] || "";
+                    const authorName = row['작성자'] || "미지정";
+                    const addressName = row['주소'] || ""; // ★ 주소 추가
                     
-                    // ★ 엑셀에 고유 ID가 있으면 그걸 사용하고, (손으로 직접 추가한 줄이라서) 없으면 기존처럼 날짜+상호명을 씁니다.
-                    const importedId = row['관리번호(수정금지)'];
-                    const key = importedId ? importedId : (dateStr + '_' + companyName);
+                    // ★ 핵심: 엑셀 데이터에서 [작성자_일자_상호명_주소] 고유 키 생성
+                    const compositeKey = `${authorName}_${dateStr}_${companyName}_${addressName}`;
+                    const key = compositeKey;
 
                     // 처음 나오는 업체면 기본 틀 생성
                     if (!tempGroup[key]) {
@@ -1691,7 +1946,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                         }
 
                         tempGroup[key] = {
-                            id: importedId || (Date.now() + Math.random()), // ★ 불러온 ID가 있으면 그대로 유지
+                            id: compositeKey, // ★ 난수 대신 조합된 고유 키 사용
+                            author: authorName, // ★ 작성자 정보 저장
                             date: dateStr,
                             office: row['총괄국'] || "",
                             company: companyName,
@@ -1699,6 +1955,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                             mall: row['온라인몰'] || "",
                             manager: row['담당자'] || "", 
                             contact: row['연락처'] || "",
+                            companion: row['동행자'] || "", // ★ 이 줄 추가
+                            source: row['정보제공자'] || "", // ★ 이 줄 추가
                             status: row['마케팅 상태'] || "진행 전",
                             marketing: row['마케팅 내용'] || "",
                             review: row['후기'] || "",
@@ -1820,18 +2078,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
             const baseData = {
                 '일자': r.date,
+                '작성자': r.author || "미지정", // ★ 엑셀에 작성자 열 자동 추가
                 '총괄국': r.office,
                 '상호명': r.company,
                 '주소': r.address,
-                '온라인몰': r.mall,
+               '온라인몰': r.mall,
                 '담당자': r.manager, 
                 '연락처': r.contact,
+                '동행자': r.companion || "", // ★ 이 줄 추가
+                '정보제공자': r.source || "", // ★ 이 줄 추가
                 '마케팅 상태': r.status,
                 '마케팅 내용': r.marketing,
                 '후기': r.review,
-                '향후 할 일 (To-Do)': todoStrs.join('\n'), // 엑셀 줄바꿈 문자 적용
+                '향후 할 일 (To-Do)': todoStrs.join('\n'), 
                 '색상': r.color,
-                '관리번호(수정금지)': r.id // ★ 시스템 고유 ID를 엑셀에 몰래 포함시킵니다!
+                '고유키(수정금지)': r.id // ★ 난수 대신 [작성자_일자_상호명] 조합키 출력
             };
 
             // 1. 국내 데이터 처리 (물량을 숫자로 강제 변환)
@@ -1866,7 +2127,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         const worksheet = XLSX.utils.json_to_sheet(exportData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-        XLSX.writeFile(workbook, "마케팅후기.xlsx");
+        
+        // ★ 추가: 작성자 이름과 현재 날짜(YYYYMMDD)로 파일명 생성
+        const todayStr = new Date().toISOString().split('T')[0].replace(/-/g, ''); // 예: 20261104
+        const safeUserName = currentUserName ? currentUserName : "미지정";
+        const fileName = `마케팅일지_${safeUserName}_${todayStr}.xlsx`;
+        
+        XLSX.writeFile(workbook, fileName);
     }
 // ★ 여기에 파일 공유 기능을 새롭게 추가합니다 ★
     function shareExcel() {
@@ -1918,7 +2185,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         
         document.getElementById('calHeader').setAttribute('data-current-month', `${currentYear}년 ${currentMonth + 1}월 마케팅 일정`);
         
-        const searchOffice = document.getElementById('topOfficeSearch').value.trim().toLowerCase();
+        const searchOffice = "";
 
         const firstDay = new Date(currentYear, currentMonth, 1).getDay();
         const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -1967,7 +2234,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 badge.innerHTML = `<span>${stIcon} <span style="font-weight:normal; font-size:10px;">${targetLabel}</span> ${record.company || '(상호명 없음)'}</span><span>${alarmIcon}</span>`;
                 
                 // 더블클릭 시 팝업창 띄우기
-                badge.ondblclick = (e) => { e.stopPropagation(); openCompanyHistoryWindow(record.company, record.isInternational); };
+                badge.ondblclick = (e) => { e.stopPropagation(); openCompanyHistoryWindow(record.company, record.address || '', record.isInternational); };
                 
                 cell.appendChild(badge);
             });
@@ -1997,7 +2264,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         const listDiv = document.getElementById('recordList');
         listDiv.innerHTML = '';
         
-        const searchOffice = document.getElementById('topOfficeSearch').value.trim().toLowerCase();
+        const searchOffice = "";
         
         const dayRecords = records.filter(r => {
             if (r.date !== activeDate) return false;
@@ -2035,7 +2302,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         const listDiv = document.getElementById('recordList');
         listDiv.innerHTML = '';
         
-        const searchOffice = document.getElementById('topOfficeSearch').value.trim().toLowerCase();
+        const searchOffice = "";
         
         const dayRecords = records.filter(r => {
             if (r.date !== activeDate) return false;
@@ -2098,6 +2365,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         document.getElementById('mallInput').value = '';
         document.getElementById('managerInput').value = ''; 
         document.getElementById('contactInput').value = '';
+        // ★ 추가: 새 업체 작성 시 동행자, 정보제공자 칸 비우기
+        document.getElementById('companionInput').value = '';
+        document.getElementById('sourceInput').value = '';
         document.getElementById('chkDomestic').checked = true;
         document.getElementById('chkInternational').checked = false;
         
@@ -2138,6 +2408,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             document.getElementById('mallInput').value = record.mall || '';
             document.getElementById('managerInput').value = record.manager || ''; 
             document.getElementById('contactInput').value = record.contact || '';
+            // ★ 추가: 저장된 기록 불러올 때 화면에 값 넣기
+            document.getElementById('companionInput').value = record.companion || '';
+            document.getElementById('sourceInput').value = record.source || '';
             
             if (record.isInternational && record.isDomestic === false) {
                 document.getElementById('chkDomestic').checked = false;
@@ -2214,13 +2487,20 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             }
         });
 
+        // ★ 추가: 현재 설정된 이름 가져오기 (없으면 '미지정')
+        const safeUserName = currentUserName || "미지정";
+
         const dataObj = {
+            author: safeUserName, 
             office: document.getElementById('officeInput').value.trim(),
             company: company,
             address: document.getElementById('addressInput').value.trim(),
             mall: document.getElementById('mallInput').value.trim(),
             manager: document.getElementById('managerInput').value.trim(), 
             contact: document.getElementById('contactInput').value.trim(),
+            // ★ 추가: 동행자와 정보제공자 데이터를 객체에 포함시켜 저장
+            companion: document.getElementById('companionInput').value.trim(),
+            source: document.getElementById('sourceInput').value.trim(),
             isDomestic: document.getElementById('chkDomestic').checked,
             isInternational: document.getElementById('chkInternational').checked,
             domesticProduct: document.getElementById('domesticProduct').value.trim(),
@@ -2236,11 +2516,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             todos: newTodos // ★ 수집된 다중 할 일 저장
         };
 
+       // ★ 핵심: [작성자_방문일자_상호명] 형태의 고유 키 생성
+        const addressVal = document.getElementById('addressInput').value.trim();
+        const compositeKey = `${safeUserName}_${activeDate}_${company}_${addressVal}`;
+
         if (id) {
             const index = records.findIndex(r => r.id == id);
-            if (index > -1) { records[index] = { ...records[index], ...dataObj }; }
+            if (index > -1) { 
+                // 기존 데이터 수정 시에도 고유 키 업데이트
+                records[index] = { ...records[index], ...dataObj, id: compositeKey }; 
+            }
         } else {
-            records.push({ id: Date.now() + Math.random(), date: activeDate, ...dataObj });
+            // 새 기록 추가 시 난수 대신 고유 키 사용
+            records.push({ id: compositeKey, date: activeDate, ...dataObj });
         }
 
         saveToLocalStorage(); 
@@ -2292,29 +2580,49 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     renderCalendar();
     renderTodoList();  // 추가: 켜자마자 To-Do 리스트 생성
     updateTodoBadge(); // 추가: 켜자마자 탭에 빨간색 숫자 표시
-    
-   // ★ 버전에 따른 화면 UI 제어 함수
-    function applyVersionSettings() {
-        if (!IS_HQ_VERSION) {
-            // 1. 상단 총괄국 검색창 숨김
-            const searchInput = document.getElementById('topOfficeSearch');
-            if (searchInput) searchInput.style.display = 'none';
 
-            // 2. 상단의 연간 그래프 및 표 패널만 숨김 (하단 Top 5는 유지)
-            const annualPanel = document.getElementById('annualPerformancePanel');
-            if (annualPanel) annualPanel.style.display = 'none';
-            
-            // 3. 우측 입력 폼의 '총괄국' 입력칸 숨김
-            const officeContainer = document.getElementById('officeInputContainer');
-            if (officeContainer) officeContainer.style.display = 'none';
+    // ★ 페이지 로드 시 백업 안내와 이름 설정 확인 동시 실행
+    window.onload = function() {
+        checkDailyBackupNotice();
+        checkAndAskUserName(); // 이름 확인 함수 호출
+    };
+
+    // ★ 추가: 이름 확인 및 모달 제어 함수
+    function checkAndAskUserName() {
+        const nameDisplay = document.getElementById('userNameDisplay');
+        if (!currentUserName) {
+            // 이름이 없으면 팝업 띄우기
+            document.getElementById('nameSettingModal').style.display = 'flex';
+            document.getElementById('userNameInput').focus();
+            nameDisplay.textContent = '👤 담당자: 미설정';
+        } else {
+            // 이름이 있으면 팝업 안 띄우고 상단에 바로 표시
+            document.getElementById('nameSettingModal').style.display = 'none';
+            nameDisplay.textContent = `👤 담당자: ${currentUserName}`;
         }
     }
 
-    // ★ 페이지 로드 시 백업 안내와 버전 설정을 동시에 실행
-    window.onload = function() {
-        checkDailyBackupNotice();
-        applyVersionSettings(); 
-    };
+    // 이름 다시 변경하고 싶을 때 모달 띄우는 함수
+    function openNameSettingModal() {
+        document.getElementById('userNameInput').value = currentUserName;
+        document.getElementById('nameSettingModal').style.display = 'flex';
+        document.getElementById('userNameInput').focus();
+    }
+
+    // 이름 저장 버튼 눌렀을 때 실행되는 함수
+    function saveUserName() {
+        const inputName = document.getElementById('userNameInput').value.trim();
+        if (!inputName) {
+            alert('담당자 이름을 입력해주세요.');
+            return;
+        }
+        currentUserName = inputName;
+        localStorage.setItem('marketingUserName', currentUserName); // 영구 저장
+        
+        document.getElementById('nameSettingModal').style.display = 'none';
+        document.getElementById('userNameDisplay').textContent = `👤 담당자: ${currentUserName}`;
+        showToast(`👤 담당자가 '${currentUserName}'(으)로 설정되었습니다.`);
+    }
 
 // 영업 타겟 체크박스 변경 시 필드 보이기/숨기기
 function toggleTargetFields() {
