@@ -381,20 +381,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
 <div class="container">
     <div class="controls">
-        <div class="title-area">
+        <div class="title-area" style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;">
             <h2>📈 마케팅 일지 </h2>
             <span class="status-badge">자동 저장 켜짐 🟢</span>
-<!-- ★ 추가: 이름 표시 뱃지 (클릭 시 다시 변경 가능) -->
-            <span id="userNameDisplay" style="margin-left: 10px; font-size: 13px; font-weight: bold; color: #065f46; background: #d1fae5; padding: 4px 10px; border-radius: 6px; border: 1px solid #a7f3d0; cursor: pointer;" onclick="openNameSettingModal()" title="이름을 변경하려면 클릭하세요">👤 담당자: 확인 중...</span>            
+            <!-- ★ 작성자 표시 뱃지 -->
+            <span id="userNameDisplay" style="margin-left: 10px; font-size: 13px; font-weight: bold; color: #065f46; background: #d1fae5; padding: 4px 10px; border-radius: 6px; border: 1px solid #a7f3d0; cursor: pointer;" onclick="openNameSettingModal()" title="이름을 변경하려면 클릭하세요">✍️ 작성자: 확인 중...</span>            
+        </div>
 
-            <!-- ★ 탭 버튼 추가 ★ -->
-            <div class="tabs">
-                <button class="tab-btn" id="tabTodo" onclick="switchTab('todo')">
-                    📌 해야 할 일 <span id="todoBadge" style="display:none; background:#ef4444; color:white; border-radius:10px; padding:2px 6px; font-size:11px; margin-left:4px;"></span>
-                </button>
-                <button class="tab-btn active-tab" id="tabCalendar" onclick="switchTab('calendar')">📅 달력 보기</button>
-                <button class="tab-btn" id="tabDashboard" onclick="switchTab('dashboard')">📊 통계 대시보드</button>
-            </div>
+        <!-- ★ 탭 버튼들을 아래 줄로 완벽히 분리 -->
+        <div class="tabs" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+            <button class="tab-btn" id="tabTodo" onclick="switchTab('todo')">
+                📌 해야 할 일 <span id="todoBadge" style="display:none; background:#ef4444; color:white; border-radius:10px; padding:2px 6px; font-size:11px; margin-left:4px;"></span>
+            </button>
+            <button class="tab-btn active-tab" id="tabCalendar" onclick="switchTab('calendar')">📅 달력 보기</button>
+            <button class="tab-btn" id="tabDashboard" onclick="switchTab('dashboard')">📊 통계 대시보드</button>
+        </div>
         </div>
         
         <div class="btn-group">
@@ -592,7 +593,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label>담당자</label>
+                            <label>업체 담당자</label>
                             <input type="text" id="managerInput" placeholder="예: 홍길동 대리">
                         </div>
                         <div class="form-group">
@@ -876,12 +877,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <!-- ★ 추가: 담당자 이름 설정 모달 (최초 1회 팝업) ★ -->
 <div class="modal-overlay" id="nameSettingModal" style="z-index: 3000;">
     <div class="modal notice-modal" style="width: 350px; border-color: #10b981;">
-        <h2 style="color: #10b981;">👤 담당자 설정</h2>
+        <h2 style="color: #10b981;">✍️ 작성자 설정</h2>
         <div class="notice-desc" style="background: #f0fdf4;">
-            이 기기에서 사용할 <b>담당자(작성자) 이름</b>을 입력해주세요.<br>
+            이 기기에서 사용할 <b>작성자(직원) 이름</b>을 입력해주세요.<br>
             <span style="font-size: 12px; color: #6b7280;">(입력된 이름은 엑셀 파일명에 사용되며 한 번만 입력하면 됩니다)</span>
         </div>
-        <input type="text" id="userNameInput" placeholder="예: 우정이" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px; margin-bottom: 15px; text-align: center; box-sizing: border-box;">
+        <input type="text" id="userNameInput" placeholder="예: 김동욱" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px; margin-bottom: 15px; text-align: center; box-sizing: border-box;">
         <button class="btn" style="width: 100%; padding: 12px; font-size: 15px; background: #10b981;" onclick="saveUserName()">저장하고 시작하기</button>
     </div>
 </div>
@@ -2591,14 +2592,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     function checkAndAskUserName() {
         const nameDisplay = document.getElementById('userNameDisplay');
         if (!currentUserName) {
-            // 이름이 없으면 팝업 띄우기
             document.getElementById('nameSettingModal').style.display = 'flex';
             document.getElementById('userNameInput').focus();
-            nameDisplay.textContent = '👤 담당자: 미설정';
+            nameDisplay.textContent = '✍️ 작성자: 미설정';
         } else {
-            // 이름이 있으면 팝업 안 띄우고 상단에 바로 표시
             document.getElementById('nameSettingModal').style.display = 'none';
-            nameDisplay.textContent = `👤 담당자: ${currentUserName}`;
+            nameDisplay.textContent = `✍️ 작성자: ${currentUserName}`;
         }
     }
 
@@ -2613,15 +2612,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     function saveUserName() {
         const inputName = document.getElementById('userNameInput').value.trim();
         if (!inputName) {
-            alert('담당자 이름을 입력해주세요.');
+            alert('작성자 이름을 입력해주세요.');
             return;
         }
         currentUserName = inputName;
-        localStorage.setItem('marketingUserName', currentUserName); // 영구 저장
+        localStorage.setItem('marketingUserName', currentUserName); 
         
         document.getElementById('nameSettingModal').style.display = 'none';
-        document.getElementById('userNameDisplay').textContent = `👤 담당자: ${currentUserName}`;
-        showToast(`👤 담당자가 '${currentUserName}'(으)로 설정되었습니다.`);
+        document.getElementById('userNameDisplay').textContent = `✍️ 작성자: ${currentUserName}`;
+        showToast(`✍️ 작성자가 '${currentUserName}'(으)로 설정되었습니다.`);
     }
 
 // 영업 타겟 체크박스 변경 시 필드 보이기/숨기기
