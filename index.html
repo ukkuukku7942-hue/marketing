@@ -306,39 +306,42 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     body { padding: 10px; }
     .container { padding: 10px; }
     
-    /* 1. 상단 타이틀, 뱃지, 탭 메뉴를 한 줄로 강제 배치 */
+    /* 1. 상단 타이틀, 뱃지, 탭 메뉴 (수정된 부분) */
     .controls { flex-direction: column; gap: 10px; }
     
     .title-area { 
         display: flex; 
-        flex-direction: row; /* 세로 배열을 다시 가로 배열로 변경 */
+        flex-direction: row; 
         align-items: center; 
-        flex-wrap: nowrap; /* 줄바꿈 금지 */
+        flex-wrap: wrap; /* 💡 핵심: 가로가 좁으면 자연스럽게 줄바꿈(두 줄) 되도록 허용 */
         gap: 8px; 
         width: 100%;
-        overflow-x: auto; /* 화면이 좁으면 좌우로 스와이프(스크롤) 되도록 설정 */
         padding-bottom: 5px;
     }
-    /* 깔끔한 디자인을 위해 모바일 가로 스크롤바 숨기기 */
-    .title-area::-webkit-scrollbar { display: none; }
-
-    .title-area { -ms-overflow-style: none; scrollbar-width: none; }
     
     .title-area h2 { font-size: 16px; white-space: nowrap; margin: 0; }
     .status-badge { font-size: 11px; white-space: nowrap; padding: 4px 6px; }
     
-    /* 탭 버튼 스타일 조정 (우측으로 밀착) */
+    /* 2. 탭 버튼 스타일 조정 (아랫줄로 내리고 가로 크기 꽉 채우기) */
     .tabs { 
         display: flex; 
         flex-direction: row; 
-        flex-wrap: nowrap;
-        gap: 4px; 
-        margin-left: auto; /* 빈 공간을 이용해 탭을 오른쪽 끝으로 밀어줌 */
-        padding-left: 5px; 
+        width: 100%; /* 💡 핵심: 가로 100%를 차지하게 해서 제목 아래 새 줄로 밀어냄 */
+        margin-left: 0; /* PC에 있던 왼쪽 여백 제거 */
+        padding-left: 0; 
         border-left: none; 
-        width: auto;
+        gap: 6px; 
+        margin-top: 5px; /* 윗줄(제목)과의 간격 */
     }
-    .tab-btn { padding: 6px 10px; font-size: 13px; white-space: nowrap; }
+    
+    /* 탭 버튼들이 모바일 화면 가로 너비에 맞춰 3등분으로 예쁘게 꽉 차게 렌더링 */
+    .tab-btn { 
+        flex: 1; 
+        padding: 10px 5px; /* 터치하기 쉽게 세로 여백을 살짝 키움 */
+        font-size: 13px; 
+        white-space: nowrap; 
+        text-align: center; 
+    }
     
     /* 2. 상단 버튼 그룹 (추가, 저장, 초기화) 3개 한 줄 배치 */
     .btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 100%; }
@@ -381,21 +384,20 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
 <div class="container">
     <div class="controls">
-        <div class="title-area" style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;">
+        <div class="title-area">
             <h2>📈 마케팅 일지 </h2>
             <span class="status-badge">자동 저장 켜짐 🟢</span>
-            <!-- ★ 작성자 표시 뱃지 -->
+<!-- ★ 추가: 이름 표시 뱃지 (클릭 시 다시 변경 가능) -->
             <span id="userNameDisplay" style="margin-left: 10px; font-size: 13px; font-weight: bold; color: #065f46; background: #d1fae5; padding: 4px 10px; border-radius: 6px; border: 1px solid #a7f3d0; cursor: pointer;" onclick="openNameSettingModal()" title="이름을 변경하려면 클릭하세요">✍️ 작성자: 확인 중...</span>            
-        </div>
 
-        <!-- ★ 탭 버튼들을 아래 줄로 완벽히 분리 -->
-        <div class="tabs" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-            <button class="tab-btn" id="tabTodo" onclick="switchTab('todo')">
-                📌 해야 할 일 <span id="todoBadge" style="display:none; background:#ef4444; color:white; border-radius:10px; padding:2px 6px; font-size:11px; margin-left:4px;"></span>
-            </button>
-            <button class="tab-btn active-tab" id="tabCalendar" onclick="switchTab('calendar')">📅 달력 보기</button>
-            <button class="tab-btn" id="tabDashboard" onclick="switchTab('dashboard')">📊 통계 대시보드</button>
-        </div>
+            <!-- ★ 탭 버튼 추가 ★ -->
+            <div class="tabs">
+                <button class="tab-btn" id="tabTodo" onclick="switchTab('todo')">
+                    📌 해야 할 일 <span id="todoBadge" style="display:none; background:#ef4444; color:white; border-radius:10px; padding:2px 6px; font-size:11px; margin-left:4px;"></span>
+                </button>
+                <button class="tab-btn active-tab" id="tabCalendar" onclick="switchTab('calendar')">📅 달력 보기</button>
+                <button class="tab-btn" id="tabDashboard" onclick="switchTab('dashboard')">📊 통계 대시보드</button>
+            </div>
         </div>
         
         <div class="btn-group">
@@ -606,7 +608,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                     <div class="form-row">
                         <div class="form-group">
                             <label>동행자 (선택)</label>
-                            <input type="text" id="companionInput" placeholder="예: 홍길동 주무관 (매번 직접 입력)">
+                            <input type="text" id="companionInput" placeholder="예: 우정이 주무관 (매번 직접 입력)">
                         </div>
                         <div class="form-group">
                             <label>정보제공자 (선택)</label>
@@ -882,7 +884,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             이 기기에서 사용할 <b>작성자(직원) 이름</b>을 입력해주세요.<br>
             <span style="font-size: 12px; color: #6b7280;">(입력된 이름은 엑셀 파일명에 사용되며 한 번만 입력하면 됩니다)</span>
         </div>
-        <input type="text" id="userNameInput" placeholder="예: 김동욱" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px; margin-bottom: 15px; text-align: center; box-sizing: border-box;">
+        <input type="text" id="userNameInput" placeholder="예: 우식이" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px; margin-bottom: 15px; text-align: center; box-sizing: border-box;">
         <button class="btn" style="width: 100%; padding: 12px; font-size: 15px; background: #10b981;" onclick="saveUserName()">저장하고 시작하기</button>
     </div>
 </div>
